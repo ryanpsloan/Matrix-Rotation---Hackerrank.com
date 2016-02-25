@@ -1,0 +1,161 @@
+<?php
+
+class Matrix
+{
+    public $matrix = array(), $values = array(), $holder = array(), $indicies = array();
+    private $m = 0, $n = 0, $x = 0, $y = 0, $z = 0, $a = 0, $s = 1, $i = 1, $r = 0;
+    private $infinite = NULL, $limit = NULL;
+
+    function __construct($m, $n, $r, $_fp)
+    {
+        $this->m = $m;
+        $this->n = $n;
+        $this->r = $r;
+
+        for ($a = 0; $a < $this->m; $a++) {
+            $values = array_map('intval', explode(" ", trim(fgets($_fp))));
+            for ($b = 0; $b < $this->n; $b++) {
+                $this->matrix[] = $values[$b];
+
+            }
+
+        }
+
+        $this->values = $this->matrix;
+
+        $s = 1;
+        $i = 0;
+        $d = 0;
+        $var = $this->n <= $this->m ? $this->n / 2 : $this->m / 2;
+        for ($c = 0; $c < $var ; $c++) {
+       
+            $this->map($d, $s, $i);
+            $d += $this->n + 1;
+            $s++;
+            $i++;
+
+        }
+
+        $this->values = $this->holder;
+
+    }
+
+    private function map($x, $s, $i)
+    {
+        $this->i = $i;
+        $this->s = $s;
+        $this->setUp($s, $i);
+
+        $this->my_recursive_func($x);
+
+    }
+
+    private function my_recursive_func($x)
+    {
+
+
+        if ($this->x < $this->m - $this->s) {
+            $var = $x;
+            $this->indicies[$this->i][] = $x;
+            $x += $this->n;
+            $this->x++;
+
+            $this->holder[$this->i][] = $this->values[$var];
+
+
+        } elseif ($this->y < $this->n - $this->s) {
+            $var = $x;
+            $this->indicies[$this->i][] = $x;
+            $x += 1;
+            $this->y++;
+
+            $this->holder[$this->i][] = $this->values[$var];
+
+
+
+        } elseif ($this->z < $this->m - $this->s) {
+            $var = $x;
+            $this->indicies[$this->i][] = $x;
+            $x -= $this->n;
+            $this->z++;
+
+            $this->holder[$this->i][] = $this->values[$var];
+
+
+
+        } elseif ($this->a < $this->n - $this->s) {
+            $var = $x;
+            $this->indicies[$this->i][] = $x;
+            $x -= 1;
+            $this->a++;
+
+            $this->holder[$this->i][] = $this->values[$var];
+
+
+
+        }
+        if ($this->x == $this->z && $this->y == $this->a) {
+
+            return $x;
+        } else {
+            $this->my_recursive_func($x);
+        }
+    }
+
+    private function setUp($s, $i)
+    {
+        $this->i = $i;
+        $this->s = $s;
+        $this->x = $i;
+        $this->y = $i;
+        $this->z = $i;
+        $this->a = $i;
+    }
+
+    public function rotate()
+    {
+
+        for($l = 0; $l < count($this->indicies); $l++){
+            $var = $this->r % count($this->indicies[$l]);
+            $this->infinite = new InfiniteIterator(new ArrayIterator($this->indicies[$l]));
+            for($m = 0; $m < $var; $m++){
+                $this->infinite->next();
+            }
+
+            $this->limit = new LimitIterator($this->infinite, $this->infinite->key() , count($this->indicies[$l]));
+            $p = 0;
+
+            foreach($this->limit as $key => $value){
+
+                $this->matrix[$value] = $this->values[$l][$p];
+                $p++;
+            }
+        }
+    }
+    public function printMatrix()
+    {
+        
+        for ($b = 0; $b < count($this->matrix); $b++){
+            print($this->matrix[$b] . " ");
+            if ($b % $this->n == ($this->n - 1)) {
+                
+                print("\r\n");
+            }
+        }
+    }
+}
+
+
+
+$_fp = fopen("php://stdin", "r");
+/* Enter your code here. Read input from STDIN. Print output to STDOUT */
+
+$input = explode(" ",trim(fgets($_fp)));
+$m = (int) $input[0]; //rows
+$n = (int) $input[1]; //columns
+$r = (int) $input[2]; //rotation
+$matrix = new Matrix($m,$n,$r,$_fp);
+$matrix->rotate();
+$matrix->printMatrix();
+
+?>
